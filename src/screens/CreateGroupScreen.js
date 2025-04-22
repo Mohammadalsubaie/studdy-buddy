@@ -40,11 +40,23 @@ const CreateGroupScreen = () => {
         admins: [auth.currentUser.uid],
       };
 
-      await addDoc(groupsRef, newGroup);
-      Alert.alert('Success', 'Group created successfully');
-      navigation.goBack();
+      // Add the group to Firestore and get the reference
+      const docRef = await addDoc(groupsRef, newGroup);
+      console.log('Group created with ID:', docRef.id);
+      
+      // Show success message and navigate with refresh parameter
+      Alert.alert('Success', 'Group created successfully', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Pass refresh: true to trigger refresh on the groups list screen
+            navigation.navigate('GroupsList', { refresh: true });
+          }
+        }
+      ]);
     } catch (error) {
-      Alert.alert('Error', 'Failed to create group');
+      console.error('Error creating group:', error);
+      Alert.alert('Error', 'Failed to create group: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -141,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateGroupScreen; 
+export default CreateGroupScreen;

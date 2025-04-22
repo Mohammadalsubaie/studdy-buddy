@@ -8,22 +8,35 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 const GroupsScreen = () => {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const route = useRoute();
 
+  // Initial load
   useEffect(() => {
     fetchGroups();
   }, []);
 
+  
+  useEffect(() => {
+    if (route.params?.refresh) {
+      console.log('Refreshing groups list');
+      fetchGroups();
+      
+      navigation.setParams({ refresh: undefined });
+    }
+  }, [route.params?.refresh]);
+
   const fetchGroups = async () => {
     try {
+      setLoading(true);
       const groupsRef = collection(db, 'groups');
       const q = query(groupsRef);
       const querySnapshot = await getDocs(q);
@@ -33,9 +46,11 @@ const GroupsScreen = () => {
         groupsList.push({ id: doc.id, ...doc.data() });
       });
       
+      console.log('Fetched groups:', groupsList.length);
       setGroups(groupsList);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch groups');
+      console.error('Error fetching groups:', error);
+      Alert.alert('Error', 'Failed to fetch groups: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -90,6 +105,8 @@ const GroupsScreen = () => {
             <Text style={styles.emptySubText}>Create a new group to get started</Text>
           </View>
         }
+        refreshing={loading}
+        onRefresh={fetchGroups}
       />
     </View>
   );
@@ -169,4 +186,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GroupsScreen; 
+export default GroupsScreen;
