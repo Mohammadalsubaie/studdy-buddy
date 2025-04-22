@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -13,9 +13,14 @@ import TaskItem from '../components/TaskItem';
 import StudySessionCard from '../components/StudySessionCard';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { lightTheme, darkTheme } from '../utils/theme';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const { isDarkMode } = useContext(ThemeContext);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  
   const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,14 +86,14 @@ export default function HomeScreen() {
 
   return (
     <ScrollView 
-      style={styles.container}
+      style={[styles.container, {backgroundColor: theme.background}]}
       refreshControl={
         <RefreshControl refreshing={loading} onRefresh={fetchData} />
       }
     >
-      <View style={styles.header}>
+      <View style={[styles.header, {backgroundColor: theme.primary}]}>
         <Text style={styles.title}>Study Buddy</Text>
-        <View style={styles.teamInfo}>
+        <View style={[styles.teamInfo, {backgroundColor: 'rgba(255, 255, 255, 0.2)'}]}>
           <Text style={styles.teamTitle}>Team Members:</Text>
           <Text style={styles.memberName}>ABDULLAH ALHARBI</Text>
           <Text style={styles.memberName}>MOHAMMED ALSUBAIE</Text>
@@ -98,19 +103,19 @@ export default function HomeScreen() {
       </View>
       
       <View style={styles.progressSection}>
-        <Text style={styles.sectionTitle}>Your Progress</Text>
-        <View style={styles.progressCard}>
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Your Progress</Text>
+        <View style={[styles.progressCard, {backgroundColor: theme.card}]}>
           <View style={styles.progressInfo}>
-            <Text style={styles.progressPercentage}>{progressPercentage}%</Text>
-            <Text style={styles.progressText}>
+            <Text style={[styles.progressPercentage, {color: theme.primary}]}>{progressPercentage}%</Text>
+            <Text style={[styles.progressText, {color: theme.secondaryText}]}>
               {completedTasks} of {totalTasks} tasks completed
             </Text>
           </View>
-          <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBarContainer, {backgroundColor: isDarkMode ? '#444' : '#e0e0e0'}]}>
             <View 
               style={[
                 styles.progressBar, 
-                { width: `${progressPercentage}%` }
+                { width: `${progressPercentage}%`, backgroundColor: theme.primary }
               ]} 
             />
           </View>
@@ -119,9 +124,9 @@ export default function HomeScreen() {
       
       <View style={styles.tasksSection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Upcoming Tasks</Text>
+          <Text style={[styles.sectionTitle, {color: theme.text}]}>Upcoming Tasks</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Tasks')}>
-            <Text style={styles.seeAllText}>See All</Text>
+            <Text style={[styles.seeAllText, {color: theme.primary}]}>See All</Text>
           </TouchableOpacity>
         </View>
         
@@ -130,10 +135,10 @@ export default function HomeScreen() {
             <TaskItem key={task.id} task={task} />
           ))
         ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No upcoming tasks</Text>
+          <View style={[styles.emptyState, {backgroundColor: theme.card}]}>
+            <Text style={[styles.emptyStateText, {color: theme.secondaryText}]}>No upcoming tasks</Text>
             <TouchableOpacity 
-              style={styles.addButton}
+              style={[styles.addButton, {backgroundColor: theme.primary}]}
               onPress={() => navigation.navigate('Tasks')}
             >
               <Text style={styles.addButtonText}>Add Task</Text>
@@ -144,9 +149,9 @@ export default function HomeScreen() {
       
       <View style={styles.sessionsSection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Study Sessions</Text>
+          <Text style={[styles.sectionTitle, {color: theme.text}]}>Study Sessions</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Schedule')}>
-            <Text style={styles.seeAllText}>See All</Text>
+            <Text style={[styles.seeAllText, {color: theme.primary}]}>See All</Text>
           </TouchableOpacity>
         </View>
         
@@ -155,10 +160,10 @@ export default function HomeScreen() {
             <StudySessionCard key={session.id} session={session} />
           ))
         ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No upcoming study sessions</Text>
+          <View style={[styles.emptyState, {backgroundColor: theme.card}]}>
+            <Text style={[styles.emptyStateText, {color: theme.secondaryText}]}>No upcoming study sessions</Text>
             <TouchableOpacity 
-              style={styles.addButton}
+              style={[styles.addButton, {backgroundColor: theme.primary}]}
               onPress={() => navigation.navigate('Schedule')}
             >
               <Text style={styles.addButtonText}>Schedule Session</Text>
@@ -169,47 +174,47 @@ export default function HomeScreen() {
 
       <View style={styles.featuresContainer}>
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={[styles.featureCard, {backgroundColor: theme.card}]}
           onPress={() => navigation.navigate('StudyTimer')}
         >
-          <Ionicons name="timer-outline" size={40} color="#007AFF" />
-          <Text style={styles.featureTitle}>Study Timer</Text>
-          <Text style={styles.featureDescription}>Start a focused study session with our Pomodoro timer</Text>
+          <Ionicons name="timer-outline" size={40} color={theme.primary} />
+          <Text style={[styles.featureTitle, {color: theme.text}]}>Study Timer</Text>
+          <Text style={[styles.featureDescription, {color: theme.secondaryText}]}>Start a focused study session with our Pomodoro timer</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={[styles.featureCard, {backgroundColor: theme.card}]}
           onPress={() => navigation.navigate('Groups')}
         >
-          <Ionicons name="people-outline" size={40} color="#007AFF" />
-          <Text style={styles.featureTitle}>Study Groups</Text>
-          <Text style={styles.featureDescription}>Join or create study groups</Text>
+          <Ionicons name="people-outline" size={40} color={theme.primary} />
+          <Text style={[styles.featureTitle, {color: theme.text}]}>Study Groups</Text>
+          <Text style={[styles.featureDescription, {color: theme.secondaryText}]}>Join or create study groups</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={[styles.featureCard, {backgroundColor: theme.card}]}
           onPress={() => navigation.navigate('Tasks')}
         >
-          <Ionicons name="list-outline" size={40} color="#007AFF" />
-          <Text style={styles.featureTitle}>Tasks</Text>
-          <Text style={styles.featureDescription}>Manage your study tasks</Text>
+          <Ionicons name="list-outline" size={40} color={theme.primary} />
+          <Text style={[styles.featureTitle, {color: theme.text}]}>Tasks</Text>
+          <Text style={[styles.featureDescription, {color: theme.secondaryText}]}>Manage your study tasks</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.featureCard}
+          style={[styles.featureCard, {backgroundColor: theme.card}]}
           onPress={() => navigation.navigate('Schedule')}
         >
-          <Ionicons name="calendar-outline" size={40} color="#007AFF" />
-          <Text style={styles.featureTitle}>Schedule</Text>
-          <Text style={styles.featureDescription}>Plan your study sessions</Text>
+          <Ionicons name="calendar-outline" size={40} color={theme.primary} />
+          <Text style={[styles.featureTitle, {color: theme.text}]}>Schedule</Text>
+          <Text style={[styles.featureDescription, {color: theme.secondaryText}]}>Plan your study sessions</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
+      <View style={[styles.footer, {borderTopColor: theme.border}]}>
+        <Text style={[styles.footerText, {color: theme.secondaryText}]}>
           CS475 - Mobile Development
         </Text>
-        <Text style={styles.footerText}>
+        <Text style={[styles.footerText, {color: theme.secondaryText}]}>
         Mohammad Alsubaie
         </Text>
       </View>
@@ -220,12 +225,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   header: {
     padding: 20,
     paddingTop: 40,
-    backgroundColor: '#007AFF',
   },
   title: {
     fontSize: 32,
@@ -235,7 +238,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   teamInfo: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
@@ -264,7 +266,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   progressCard: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     shadowColor: '#000',
@@ -281,22 +282,18 @@ const styles = StyleSheet.create({
   progressPercentage: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
     marginRight: 10,
   },
   progressText: {
     fontSize: 14,
-    color: '#666',
   },
   progressBarContainer: {
     height: 8,
-    backgroundColor: '#e0e0e0',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#007AFF',
   },
   tasksSection: {
     padding: 20,
@@ -314,14 +311,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   seeAllText: {
-    color: '#007AFF',
     fontSize: 14,
   },
   emptyState: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -333,11 +327,9 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 10,
   },
   addButton: {
-    backgroundColor: '#007AFF',
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
@@ -350,10 +342,8 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
   },
   footerText: {
-    color: '#666',
     fontSize: 14,
     marginBottom: 5,
   },
@@ -361,7 +351,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   featureCard: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
     marginBottom: 15,
@@ -383,7 +372,6 @@ const styles = StyleSheet.create({
   },
   featureDescription: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
   },
 });

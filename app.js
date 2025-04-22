@@ -1,16 +1,18 @@
-import 'react-native-gesture-handler'; // this need to be at the top or first 
+// app.js (modified)
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View, Text, ActivityIndicator, LogBox } from 'react-native';
+import { View, Text, ActivityIndicator, LogBox, StatusBar } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { auth } from './src/services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import MainNavigator from './src/navigation/MainNavigator';
+import { ThemeProvider, ThemeContext } from './src/contexts/ThemeContext';
+import { lightTheme, darkTheme } from './src/utils/theme';
 
-
-// igonre specifi warning if that happens by dependencies
+// ignore specific warning if that happens by dependencies
 LogBox.ignoreLogs(['Warning: ...']); 
 
 // Simple loading component
@@ -23,9 +25,23 @@ const LoadingScreen = () => (
 
 const Stack = createStackNavigator();
 
-export default function App() {
+const AppContent = () => {
+  const { isDarkMode } = React.useContext(ThemeContext);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
+
+  // Create navigation theme based on dark mode setting
+  const navigationTheme = {
+    ...(isDarkMode ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDarkMode ? DarkTheme.colors : DefaultTheme.colors),
+      primary: isDarkMode ? darkTheme.primary : lightTheme.primary,
+      background: isDarkMode ? darkTheme.background : lightTheme.background,
+      card: isDarkMode ? darkTheme.card : lightTheme.card,
+      text: isDarkMode ? darkTheme.text : lightTheme.text,
+      border: isDarkMode ? darkTheme.border : lightTheme.border,
+    },
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -42,8 +58,12 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
+    <>
+      <StatusBar 
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+        backgroundColor={isDarkMode ? darkTheme.background : lightTheme.background}
+      />
+      <NavigationContainer theme={navigationTheme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {user ? (
             <Stack.Screen name="Main" component={MainNavigator} />
@@ -52,6 +72,16 @@ export default function App() {
           )}
         </Stack.Navigator>
       </NavigationContainer>
+    </>
+  );
+};
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

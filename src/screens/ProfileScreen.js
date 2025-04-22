@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -19,16 +19,20 @@ import {
   EmailAuthProvider 
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { lightTheme, darkTheme } from '../utils/theme';
 
 export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [editNameModalVisible, setEditNameModalVisible] = useState(false);
   const [editPasswordModalVisible, setEditPasswordModalVisible] = useState(false);
   const [newName, setNewName] = useState(auth.currentUser?.displayName || '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const theme = isDarkMode ? darkTheme : lightTheme;
 
   const handleLogout = async () => {
     try {
@@ -101,12 +105,12 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
+    <ScrollView style={[styles.container, {backgroundColor: theme.background}]}>
+      <View style={[styles.header, {backgroundColor: theme.primary}]}>
         <Text style={styles.headerTitle}>Profile</Text>
       </View>
       
-      <View style={styles.profileSection}>
+      <View style={[styles.profileSection, {backgroundColor: theme.card}]}>
         <View style={styles.profileInfo}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarText}>
@@ -114,29 +118,29 @@ export default function ProfileScreen() {
             </Text>
           </View>
           <View style={styles.nameContainer}>
-            <Text style={styles.userName}>{auth.currentUser?.displayName || 'User'}</Text>
-            <Text style={styles.userEmail}>{auth.currentUser?.email}</Text>
+            <Text style={[styles.userName, {color: theme.text}]}>{auth.currentUser?.displayName || 'User'}</Text>
+            <Text style={[styles.userEmail, {color: theme.secondaryText}]}>{auth.currentUser?.email}</Text>
           </View>
         </View>
         <TouchableOpacity 
-          style={styles.editButton}
+          style={[styles.editButton, {backgroundColor: isDarkMode ? '#333' : '#f0f0f0'}]}
           onPress={() => setEditNameModalVisible(true)}
         >
-          <Text style={styles.editButtonText}>Edit</Text>
+          <Text style={[styles.editButtonText, {color: theme.primary}]}>Edit</Text>
         </TouchableOpacity>
       </View>
       
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
+      <View style={[styles.section, {backgroundColor: theme.card}]}>
+        <Text style={[styles.sectionTitle, {color: theme.text, borderBottomColor: theme.border}]}>Account</Text>
         <TouchableOpacity 
-          style={styles.menuItem}
+          style={[styles.menuItem, {borderBottomColor: theme.border}]}
           onPress={() => setEditPasswordModalVisible(true)}
         >
           <View style={styles.menuItemLeft}>
-            <Ionicons name="lock-closed-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Change Password</Text>
+            <Ionicons name="lock-closed-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Change Password</Text>
           </View>
-          <Ionicons name="chevron-forward" size={22} color="#ccc" />
+          <Ionicons name="chevron-forward" size={22} color={theme.secondaryText} />
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -166,65 +170,65 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
       
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <View style={styles.menuItem}>
+      <View style={[styles.section, {backgroundColor: theme.card}]}>
+        <Text style={[styles.sectionTitle, {color: theme.text, borderBottomColor: theme.border}]}>Settings</Text>
+        <View style={[styles.menuItem, {borderBottomColor: theme.border}]}>
           <View style={styles.menuItemLeft}>
-            <Ionicons name="notifications-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Notifications</Text>
+            <Ionicons name="notifications-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Notifications</Text>
           </View>
           <Switch
             value={notificationsEnabled}
             onValueChange={setNotificationsEnabled}
-            trackColor={{ false: "#ccc", true: "#007AFF" }}
+            trackColor={{ false: "#ccc", true: theme.primary }}
           />
         </View>
         
-        <View style={styles.menuItem}>
+        <View style={[styles.menuItem, {borderBottomColor: theme.border}]}>
           <View style={styles.menuItemLeft}>
-            <Ionicons name="moon-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Dark Mode</Text>
+            <Ionicons name="moon-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Dark Mode</Text>
           </View>
           <Switch
-            value={darkModeEnabled}
-            onValueChange={setDarkModeEnabled}
-            trackColor={{ false: "#ccc", true: "#007AFF" }}
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+            trackColor={{ false: "#ccc", true: theme.primary }}
           />
         </View>
       </View>
       
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
-        <TouchableOpacity style={styles.menuItem}>
+      <View style={[styles.section, {backgroundColor: theme.card}]}>
+        <Text style={[styles.sectionTitle, {color: theme.text, borderBottomColor: theme.border}]}>About</Text>
+        <TouchableOpacity style={[styles.menuItem, {borderBottomColor: theme.border}]}>
           <View style={styles.menuItemLeft}>
-            <Ionicons name="information-circle-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Help & Support</Text>
+            <Ionicons name="information-circle-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Help & Support</Text>
           </View>
-          <Ionicons name="chevron-forward" size={22} color="#ccc" />
+          <Ionicons name="chevron-forward" size={22} color={theme.secondaryText} />
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={[styles.menuItem, {borderBottomColor: theme.border}]}>
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="document-text-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Terms & Conditions</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={22} color={theme.secondaryText} />
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.menuItem}>
           <View style={styles.menuItemLeft}>
-            <Ionicons name="document-text-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Terms & Conditions</Text>
+            <Ionicons name="shield-outline" size={22} color={theme.primary} />
+            <Text style={[styles.menuItemText, {color: theme.text}]}>Privacy Policy</Text>
           </View>
-          <Ionicons name="chevron-forward" size={22} color="#ccc" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.menuItem}>
-          <View style={styles.menuItemLeft}>
-            <Ionicons name="shield-outline" size={22} color="#007AFF" />
-            <Text style={styles.menuItemText}>Privacy Policy</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color="#ccc" />
+          <Ionicons name="chevron-forward" size={22} color={theme.secondaryText} />
         </TouchableOpacity>
       </View>
       
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
+        <Text style={[styles.footerText, {color: theme.secondaryText}]}>
           CS475 - Mobile Development
         </Text>
-        <Text style={styles.footerText}>
+        <Text style={[styles.footerText, {color: theme.secondaryText}]}>
         Mohammad Alsubaie
         </Text>
        
@@ -238,25 +242,30 @@ export default function ProfileScreen() {
         onRequestClose={() => setEditNameModalVisible(false)}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Name</Text>
+          <View style={[styles.modalView, {backgroundColor: theme.card}]}>
+            <View style={[styles.modalHeader, {borderBottomColor: theme.border}]}>
+              <Text style={[styles.modalTitle, {color: theme.text}]}>Edit Name</Text>
               <TouchableOpacity onPress={() => setEditNameModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={24} color={theme.text} />
               </TouchableOpacity>
             </View>
             
             <View style={styles.modalContent}>
-              <Text style={styles.inputLabel}>Name</Text>
+              <Text style={[styles.inputLabel, {color: theme.text}]}>Name</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, {
+                  backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
+                  borderColor: theme.border,
+                  color: theme.text
+                }]}
                 placeholder="Your name"
+                placeholderTextColor={theme.secondaryText}
                 value={newName}
                 onChangeText={setNewName}
               />
               
               <TouchableOpacity 
-                style={styles.saveButton}
+                style={[styles.saveButton, {backgroundColor: theme.primary}]}
                 onPress={handleUpdateName}
               >
                 <Text style={styles.saveButtonText}>Update</Text>
@@ -274,44 +283,59 @@ export default function ProfileScreen() {
         onRequestClose={() => setEditPasswordModalVisible(false)}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Change Password</Text>
+          <View style={[styles.modalView, {backgroundColor: theme.card}]}>
+            <View style={[styles.modalHeader, {borderBottomColor: theme.border}]}>
+              <Text style={[styles.modalTitle, {color: theme.text}]}>Change Password</Text>
               <TouchableOpacity onPress={() => setEditPasswordModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={24} color={theme.text} />
               </TouchableOpacity>
             </View>
             
             <View style={styles.modalContent}>
-              <Text style={styles.inputLabel}>Current Password</Text>
+              <Text style={[styles.inputLabel, {color: theme.text}]}>Current Password</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, {
+                  backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
+                  borderColor: theme.border,
+                  color: theme.text
+                }]}
                 placeholder="Current password"
+                placeholderTextColor={theme.secondaryText}
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 secureTextEntry
               />
               
-              <Text style={styles.inputLabel}>New Password</Text>
+              <Text style={[styles.inputLabel, {color: theme.text}]}>New Password</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, {
+                  backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
+                  borderColor: theme.border,
+                  color: theme.text
+                }]}
                 placeholder="New password"
+                placeholderTextColor={theme.secondaryText}
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
               />
               
-              <Text style={styles.inputLabel}>Confirm New Password</Text>
+              <Text style={[styles.inputLabel, {color: theme.text}]}>Confirm New Password</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, {
+                  backgroundColor: isDarkMode ? '#333' : '#f9f9f9',
+                  borderColor: theme.border,
+                  color: theme.text
+                }]}
                 placeholder="Confirm new password"
+                placeholderTextColor={theme.secondaryText}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
               />
               
               <TouchableOpacity 
-                style={styles.saveButton}
+                style={[styles.saveButton, {backgroundColor: theme.primary}]}
                 onPress={handleUpdatePassword}
               >
                 <Text style={styles.saveButtonText}>Update Password</Text>
@@ -327,12 +351,10 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   header: {
     padding: 20,
     paddingTop: 50,
-    backgroundColor: '#007AFF',
   },
   headerTitle: {
     fontSize: 24,
@@ -343,7 +365,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
@@ -376,25 +397,20 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 5,
   },
   userEmail: {
     fontSize: 14,
-    color: '#666',
   },
   editButton: {
-    backgroundColor: '#f0f0f0',
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
   editButtonText: {
-    color: '#007AFF',
     fontWeight: '500',
   },
   section: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 20,
     shadowColor: '#000',
@@ -407,10 +423,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   menuItem: {
     flexDirection: 'row',
@@ -419,7 +433,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -427,7 +440,6 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: '#333',
     marginLeft: 15,
   },
   logoutText: {
@@ -439,12 +451,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   footerText: {
-    color: '#666',
     fontSize: 14,
     marginBottom: 5,
   },
   versionText: {
-    color: '#999',
     fontSize: 12,
     marginTop: 5,
   },
@@ -455,7 +465,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalView: {
-    backgroundColor: 'white',
     borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: {
@@ -473,12 +482,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   modalContent: {
     padding: 20,
@@ -486,20 +493,16 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#f9f9f9',
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
